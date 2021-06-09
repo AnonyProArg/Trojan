@@ -60,7 +60,7 @@ echo " EL APK NO BLEQUEA EL PERFIL PARA COMPARTIR, TAMPOCO LO ENCRIPTA"
 echo ""
 echo " LINK DEL APK COMPATIBLE: https://www.mediafire.com/folder/hmq5cstvcg9gk/TROJAN-GO "
 echo ""
-echo " FIN DEL CURSO. TECLEA 7 PARA VOLVER AL MENU"
+echo " FIN DEL CURSO. PRESIONA CUALQUIERA LETRA VOLVER AL MENU" && read key
 }   
 
 VPS-ARG (){
