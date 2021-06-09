@@ -18,7 +18,7 @@ cf_node_default="icook.tw"
 log_path="/var/log/xwall.log"
 
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-  echo "您不是 root 用户！请先输入 sudo -i 切换至 root 用户再运行本脚本"
+  echo "¡No eres un usuario root! Ingrese sudo -i para cambiar al usuario root antes de ejecutar este script"
   exit
 fi
 
@@ -55,11 +55,11 @@ identify_the_operating_system_and_architecture() {
         ;;
     esac
     if [[ ! -f '/etc/os-release' ]]; then
-      echo "error: Don't use outdated Linux distributions."
+      echo "error: no utilice distribuciones de Linux obsoletas."
       exit 1
     fi
     if [[ -z "$(ls -l /sbin/init | grep systemd)" ]]; then
-      echo "error: Only Linux distributions using systemd are supported."
+      echo "error: solo se admiten las distribuciones de Linux que utilizan systemd."
       exit 1
     fi
     if [[ "$(command -v apt)" ]]; then
@@ -81,11 +81,11 @@ identify_the_operating_system_and_architecture() {
       PACKAGE_MANAGEMENT_INSTALL='pacman -S'
       PACKAGE_MANAGEMENT_REMOVE='pacman -R'
     else
-      echo "error: The script does not support the package manager in this operating system."
+      echo "error: el script no es compatible con el administrador de paquetes en este sistema operativo."
       exit 1
     fi
   else
-    echo "error: This operating system is not supported."
+    echo "error: este sistema operativo no es compatible."
     exit 1
   fi
 }
@@ -115,7 +115,7 @@ writeLog() {
 }
 
 continue_prompt() {
-  read -rp "继续其他操作 (yes/no)? " choice
+  read -rp "¿Continuar con otras operaciones (Yes/no)? " choice
   case "${choice}" in
     [yY]|[yY][eE][sS] ) return 0 ;;
     * ) exit 0;;
@@ -131,7 +131,7 @@ build_web() {
     unzip -q /tmp/template.zip -d /var/www/html
     echo -ne "User-agent: *\nDisallow: /\n" > /var/www/html/robots.txt
   else
-    echo "Dummy website existed. Skip building."
+    echo "Existía un sitio web ficticio. Saltar edificio."
   fi
 }
 
@@ -139,22 +139,22 @@ checkIP() {
   local realIP4="$(curl -sL ${ip4_api} -m 5)"
   local resolvedIP4="$(curl -sSL https://cloudflare-dns.com/dns-query\?name\=$1\&type\=A -H 'accept: application/dns-json' | jq ".Answer | .[] | select(.type == 1) | .data" --raw-output)"
 
-  [ ! -z "${realIP4}" ] && printf "%s %s\n" "detected IPv4 address:" "${realIP4}" | writeLog >> $log_path
-  ([ ! -z "${resolvedIP4}" ] && [ "${resolvedIP4}" != "null" ]) && printf "%s %s\n" "found A record:" "${resolvedIP4}" | writeLog >> $log_path
+  [ ! -z "${realIP4}" ] && printf "%s %s\n" "dirección IPv4 detectada:" "${realIP4}" | writeLog >> $log_path
+  ([ ! -z "${resolvedIP4}" ] && [ "${resolvedIP4}" != "null" ]) && printf "%s %s\n" "encontró un registro:" "${resolvedIP4}" | writeLog >> $log_path
 
   if [[ "${realIP4}" == "${resolvedIP4}" ]]; then
-    echo "A record matched." | writeLog >> $log_path
+    echo "Un récord igualado." | writeLog >> $log_path
     return 0
   else
     local realIP6="$(curl -sL ${ip6_api} -m 5)"
     local resolvedIP6="$(curl -sSL https://cloudflare-dns.com/dns-query\?name\=$1\&type\=AAAA -H 'accept: application/dns-json' | jq ".Answer | .[] | select(.type == 28) | .data" --raw-output)"
-    [ ! -z "${realIP6}" ] && printf "%s %s\n" "detected IPv6 address:" "${realIP6}" | writeLog >> $log_path
-    ([ ! -z "${resolvedIP6}" ] && [ "${resolvedIP6}" != "null" ]) && printf "%s %s\n" "found AAAA record:" "${resolvedIP6}" | writeLog >> $log_path
+    [ ! -z "${realIP6}" ] && printf "%s %s\n" "dirección IPv6 detectada:" "${realIP6}" | writeLog >> $log_path
+    ([ ! -z "${resolvedIP6}" ] && [ "${resolvedIP6}" != "null" ]) && printf "%s %s\n" "encontrado registro AAAA:" "${resolvedIP6}" | writeLog >> $log_path
     if [[ "${realIP6}" == "${resolvedIP6}" ]]; then
-      echo "AAAA record matched." | writeLog >> $log_path
+      echo "Registro AAAA igualado." | writeLog >> $log_path
       return 0
     else
-      echo "neither A record nor AAAA record matched, return 1" | writeLog >> $log_path
+      echo "ni el registro A ni el registro AAAA coinciden, devuelve 1" | writeLog >> $log_path
       return 1
     fi
   fi
@@ -168,7 +168,7 @@ show_links() {
     local cf_node="$(read_json /usr/local/etc/xray/05_inbounds_ss.json '.inbounds[0].tag')"
     # path ss+ws: /[base], path vless+ws: /[base]ws, path vmess+ws: /[base]wss, path trojan+ws: /[base]tj
 
-    colorEcho ${YELLOW} "===============分 享 链 接 (直连)==============="
+    colorEcho ${YELLOW} "===============分 SIN WEBSOCK (conexión directa)==============="
     colorEcho ${BLUE} "VLESS XTLS"
     #https://github.com/XTLS/Xray-core/issues/91
     local uri_vless="${uuid}@${sni}:443?security=xtls&flow=rprx-xtls-direct#`urlEncode "${sni} (VLESS)"`"
@@ -186,7 +186,7 @@ show_links() {
     printf "%s\n" "ss://${uri_ss}"
     echo ""
 
-    colorEcho ${YELLOW} "===============分 享 链 接 (CDN)==============="
+    colorEcho ${YELLOW} "=============== LINKS RECOMENDADOS-WEBSOCK(CDN)==============="
     colorEcho ${BLUE} "VLESS WSS"
     #https://github.com/XTLS/Xray-core/issues/91
     local uri_vless_wss="${uuid}@${cf_node}:443?type=ws&security=tls&host=${sni}&path=`urlEncode ${path}ws?ed=2048`&sni=${sni}#`urlEncode "${sni} (VLESS+WSS)"`"
@@ -197,7 +197,7 @@ show_links() {
     local uri_trojango="${uuid}@${sni}:443?sni=${sni}&type=ws&host=${sni}&path=`urlEncode "${path}tj"`#`urlEncode "${sni} (Trojan-Go)"`"
     local uri_trojango_cf="${uuid}@${cf_node}:443?sni=${sni}&type=ws&host=${sni}&path=`urlEncode "${path}tj"`#`urlEncode "${sni} (Trojan-Go)"`"
     printf "%s\n" "trojan-go://${uri_trojango_cf}" "trojan-go://${uri_trojango}"
-    colorEcho ${YELLOW} "因 Trojan-Go 分享链接格式尚未定案，若您的客户端无法解析此链接，请手动填写连接信息"
+    colorEcho ${YELLOW} "Trojan-Go El formato del enlace para compartir no se ha finalizado. Si su cliente no puede analizar este enlace, complete la información de conexión manualmente."
     printf "%s:443 %s %s\n" "${sni}" "${uuid}" "${path}tj"
     echo ""
 
@@ -263,7 +263,7 @@ get_trojan() {
 
     echo "trojan-go is installed."
   else
-    colorEcho ${BLUE} "Getting the latest version of trojan-go"
+    colorEcho ${BLUE} "Obtener la última versión de trojan-go"
     local latest_version="$(curl -sL "https://${api_proxy}/repos/p4gefau1t/trojan-go/releases" | jq '.[0].tag_name' --raw-output)"
     echo "${latest_version}"
     local trojango_link="https://${gh_proxy}/github.com/p4gefau1t/trojan-go/releases/download/${latest_version}/trojan-go-linux-${TJ_MACHINE}.zip"
@@ -272,7 +272,7 @@ get_trojan() {
     wget -q --show-progress "${trojango_link}" -O trojan-go.zip
     unzip -q trojan-go.zip && rm -rf trojan-go.zip
     $(which mv) trojan-go /usr/bin/trojan-go && $(which chmod) +x /usr/bin/trojan-go
-    colorEcho ${GREEN} "trojan-go has been updated."
+    colorEcho ${GREEN} "trojan-go ha sido actualizado."
   fi
 }
 
@@ -303,7 +303,7 @@ get_xray() {
   if [ ! -f "/usr/local/bin/xray" ]; then
     echo "XRay-Core is not installed. start installation"
 
-    echo "Getting the latest version of xray-core"
+    echo "Obtener la última versión de xray-core"
     latest_version=`curl -sL "https://${api_proxy}/repos/XTLS/Xray-core/releases/latest" | jq '.tag_name' --raw-output`
     echo "${latest_version}"
     local xray_link="https://${gh_proxy}/github.com/XTLS/Xray-core/releases/download/${latest_version}/Xray-linux-${V2_MACHINE}.zip"
@@ -329,7 +329,7 @@ get_xray() {
     systemctl daemon-reload 2>&1 | writeLog >> $log_path
     systemctl enable xray 2>&1 | writeLog >> $log_path
 
-    echo "XRay-Core ${latest_version} is installed."
+    echo "XRay-Core ${latest_version} esta instalado."
   else
     echo "Getting the latest version of xray-core"
     latest_version=`curl -sL "https://${api_proxy}/repos/XTLS/Xray-core/releases/latest" | jq '.tag_name' --raw-output`
@@ -343,7 +343,7 @@ get_xray() {
     printf "Installed: %s\n" "/usr/local/bin/xray"
 
     systemctl restart xray
-    colorEcho ${GREEN} "XRay-Core ${latest_version} has been updated."
+    colorEcho ${GREEN} "XRay-Core ${latest_version} Ha sido actualizado."
   fi
 }
 
@@ -538,13 +538,13 @@ EOF
 fix_cert() {
   if [ -f "/usr/local/bin/xray" ]; then
     while true; do
-      read -rp "解析到本 VPS 的域名: " V2_DOMAIN
+      read -rp "Resuelva el nombre de dominio de este VPS: " V2_DOMAIN
       if checkIP "${V2_DOMAIN}"; then
-        colorEcho $LYELLOW "域名 ${V2_DOMAIN} 解析正确, 即将开始修复证书"
+        colorEcho $LYELLOW "nombre de dominio${V2_DOMAIN}El análisis es correcto, el certificado se reparará pronto"
         break
       else
-        colorEcho ${RED} "域名 ${V2_DOMAIN} 解析有误 (yes: 强制继续, no: 重新输入, quit: 离开)"
-        read -rp "若您确定域名解析正确, 可以继续进行修复作业. 强制继续? (yes/no/quit) " forceConfirm
+        colorEcho ${RED} "nombre de dominio ${V2_DOMAIN} Error de análisis (sí: forzar continuar, no: volver a ingresar, salir: salir)"
+        read -rp "Si está seguro de que el nombre de dominio se ha resuelto correctamente, puede continuar con la operación de reparación. ¿Forzar continuar? (Sí / no / salir) " forceConfirm
         case "${forceConfirm}" in
           [yY]|[yY][eE][sS] ) break ;;
           [qQ]|[qQ][uU][iI][tT] ) return 0;;
@@ -571,26 +571,26 @@ fix_cert() {
 
     write_json /usr/local/etc/xray/05_inbounds_vless.json ".inbounds[0].tag" "\"${V2_DOMAIN}\""
 
-    colorEcho $LGREEN "证书修复完成"
+    colorEcho $LGREEN "Reparación de certificado completada"
     show_links
   else
-    colorEcho ${YELLOW} "请先安装 XRay"
+    colorEcho ${YELLOW} "Primero instale XRay"
   fi
 }
 
 install_xray() {
-  colorEchoFlush $BLUE "安装依赖包 coreutils curl wget unzip jq certbot nginx"
+  colorEchoFlush $BLUE "Instalar el paquete de dependencia coreutils curl wget descomprimir jq certbot nginx"
   preinstall 2>&1 | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 安装依赖包 coreutils curl wget unzip jq certbot nginx"
+  colorEcho $LGREEN "Finalizar: instale el paquete de dependencia coreutils curl wget unzip jq certbot nginx"
 
   while true; do
-    read -rp "解析到本 VPS 的域名: " V2_DOMAIN
+    read -rp "Resuelva el nombre de dominio de este VPS: " V2_DOMAIN
     if checkIP "${V2_DOMAIN}"; then
-      colorEcho $LYELLOW "域名 ${V2_DOMAIN} 解析正确, 即将开始安装"
+      colorEcho $LYELLOW "nombre de dominio ${V2_DOMAIN} El análisis es correcto y la instalación comenzará pronto"
       break
     else
-      colorEcho ${RED} "域名 ${V2_DOMAIN} 解析有误 (yes: 强制继续, no: 重新输入, quit: 离开)"
-      read -rp "若您确定域名解析正确, 可以继续进行安装作业. 强制继续? (yes/no/quit) " forceConfirm
+      colorEcho ${RED} "nombre de dominio ${V2_DOMAIN} Error de análisis (sí: forzar continuar, no: volver a ingresar, salir: salir)"
+      read -rp "Si está seguro de que el nombre de dominio se ha resuelto correctamente, puede continuar con la operación de instalación. ¿Forzar continuar? (Sí / no / salir) " forceConfirm
       case "${forceConfirm}" in
         [yY]|[yY][eE][sS] ) break ;;
         [qQ]|[qQ][uU][iI][tT] ) return 0 ;;
@@ -600,66 +600,66 @@ install_xray() {
 
   echo "Start xray installation for domain ${V2_DOMAIN}" | writeLog >> $log_path
 
-  colorEchoFlush $BLUE "获取 xray-core\r"
+  colorEchoFlush $BLUE "Obtener xray-core\r"
   get_xray | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 获取 xray-core"
+  colorEcho $LGREEN "Hecho: Obtener xray-core"
 
-  colorEchoFlush $BLUE "获取 trojan-go\r"
+  colorEchoFlush $BLUE "Obtener trojan-go\r"
   get_trojan | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 获取 trojan-go"
+  colorEcho $LGREEN "Hecho: Obtener trojan-go"
 
   # set crontab to auto update geoip.dat and geosite.dat
-  colorEchoFlush $BLUE "设置 geoip/geosite 更新任务\r"
+  colorEchoFlush $BLUE "Configurar una tarea de actualización de geoip / geositio\r"
   (crontab -l 2>/dev/null; echo "0 7 * * * wget -q https://${raw_proxy}/Loyalsoldier/v2ray-rules-dat/release/geoip.dat -O /usr/local/share/xray/geoip.dat >/dev/null >/dev/null") | crontab -
   (crontab -l 2>/dev/null; echo "0 7 * * * wget -q https://${raw_proxy}/Loyalsoldier/v2ray-rules-dat/release/geosite.dat -O /usr/local/share/xray/geosite.dat >/dev/null >/dev/null") | crontab -
   echo "geoip/geosite crontab set" | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 设置 geoip/geosite 更新任务"
+  colorEcho $LGREEN "Finalizar: configure la tarea de actualización de geoip / geositio"
 
-  colorEchoFlush $BLUE "下载伪装网站模版"
+  colorEchoFlush $BLUE "Descargue la plantilla del sitio web de disguise"
   build_web | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 下载伪装网站模版"
+  colorEcho $LGREEN "Finalizar: descargue la plantilla del sitio web disguise"
 
   local uuid="$(cat '/proc/sys/kernel/random/uuid')"
   local path="/$(cat '/proc/sys/kernel/random/uuid' | sed -e 's/-//g' | tr '[:upper:]' '[:lower:]' | head -c $((10+$RANDOM%10)))"
 
-  colorEchoFlush $BLUE "设置 XRay"
+  colorEchoFlush $BLUE "Configurar XRay"
   set_xray "${uuid}" "${path}" "${V2_DOMAIN}" "${cf_node_default}"
-  colorEcho $LGREEN "完成: 设置 XRay"
+  colorEcho $LGREEN "完成: Configurar XRay"
 
-  colorEchoFlush $BLUE "设置 Trojan"
+  colorEchoFlush $BLUE "Configurar Trojan"
   set_trojan "${uuid}" "${path}tj" "${V2_DOMAIN}"
-  colorEcho $LGREEN "完成: 设置 Trojan"
+  colorEcho $LGREEN "realizar: Configurar Trojan"
 
-  colorEchoFlush $BLUE "设置 Nginx"
+  colorEchoFlush $BLUE "Configurar Nginx"
   set_nginx_default | writeLog >> $log_path
   set_nginx "${V2_DOMAIN}"
   systemctl restart nginx | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 设置 Nginx"
+  colorEcho $LGREEN "Finish: Setting Nginx"
 
-  colorEchoFlush $BLUE "申请 SSL 证书"
+  colorEchoFlush $BLUE "Solicita un certificado SSL"
   init_cert "${V2_DOMAIN}" 2>&1 | writeLog >> $log_path
-  colorEcho $LGREEN "完成: 申请 SSL 证书"
+  colorEcho $LGREEN "Finalizar: Solicite el certificado SSL"
 
   # activate services
-  colorEchoFlush $BLUE "启动 systemd 进程"
+  colorEchoFlush $BLUE "Iniciar el proceso systemd"
   systemctl daemon-reload | writeLog >> $log_path
   systemctl reset-failed | writeLog >> $log_path
   systemctl restart trojan-go 2>&1 | writeLog >> $log_path
   systemctl restart xray 2>&1 | writeLog >> $log_path
 
-  colorEcho $LGREEN "安装 XRay + Trojan-Go 成功!"
+  colorEcho $LGREEN "XRay + Trojan-Go instalado con éxito!"
   show_links
 }
 
 edit_cf_node() {
   if [ -f "/usr/local/bin/xray" ]; then
     local cf_node_current="$(read_json /usr/local/etc/xray/05_inbounds_ss.json '.inbounds[0].tag')"
-    printf "%s\n" "输入编号使用建议值"
+    printf "%s\n" "Ingrese el número para usar el valor recomendado"
     printf "1. %s\n" "icook.hk"
     printf "2. %s\n" "www.digitalocean.com"
     printf "3. %s\n" "www.garmin.com"
     printf "4. %s\n" "amp.cloudflare.com"
-    read -p "输入新的 CF 节点地址 [留空则使用现有值 ${cf_node_current}]: " cf_node_new
+    read -p "Ingrese la nueva dirección del nodo CF(HOST) [Déjela en blanco para usar el valor existente] ${cf_node_current}]: " cf_node_new
     case "${cf_node_new}" in
       "1") cf_node_new="icook.hk" ;;
       "2") cf_node_new="www.digitalocean.com" ;;
@@ -671,7 +671,7 @@ edit_cf_node() {
     fi
     write_json /usr/local/etc/xray/05_inbounds_ss.json ".inbounds[0].tag" "\"${cf_node_new}\""
     sleep 1
-    printf "%s\n" "CF 节点己变更为 ${cf_node_new}"
+    printf "%s\n" "El nodo CF (HOST) se ha cambiado a ${cf_node_new}"
     show_links
   fi
 }
@@ -686,25 +686,27 @@ rm_xwall() {
 show_menu() {
   echo ""
   if [ -f "/usr/local/bin/xray" ]; then
-  echo "----------域名管理----------"
-  echo "1) 修复证书 / 更换域名"
-  echo "2) 自定义 Cloudflare 节点"
-  echo "----------显示配置----------"
-  echo "3) 显示链接"
-  echo "----------更新管理----------"
-  echo "4) 更新 xray-core"
-  echo "5) 更新 trojan-go"
-  echo "----------卸载脚本----------"
-  echo "6) 卸载脚本与全部组件"
+  echo "             AnonyProArg VPS-ARG   "
+  echo ""
+  echo "----------Gestión de nombres de dominio----------"
+  echo "1) Reparar certificado / cambiar nombre de dominio"
+  echo "2) Nodo Cloudflare personalizado"
+  echo "----------Configuración de pantalla----------"
+  echo "3) Mostrar enlaces"
+  echo "----------Gestión de actualizaciones----------"
+  echo "4) Actualizar xray-core"
+  echo "5) Actualizar trojan-go"
+  echo "----------Desinstalar secuencia de comandos----------"
+  echo "6)Desinstalar el script y todos los componentes"
   else
-  echo "0) 安装 VLESS + Trojan"
+  echo "0) INSTALAR TROJAN + VLSS + SHADOWSOCK (WEBSOCK)"
   fi
-  echo "7) 退出"
+  echo "7) SALIR"
   echo ""
 }
 
 menu() {
-  colorEcho ${YELLOW} "Proxy tools automated script v${VERSION}"
+  colorEcho ${YELLOW} "Script automatizado de herramientas proxy v${VERSION}"
   colorEcho ${YELLOW} "author: phlinhng"
 
   #check_status
@@ -713,7 +715,7 @@ menu() {
 
   while true; do
     show_menu
-    read -rp "选择操作 [输入任意值退出]: " opt
+    read -rp "Seleccione la operación [Ingrese cualquier valor para salir]: " opt
     case "${opt}" in
       "0") install_xray && continue_prompt ;;
       "1") fix_cert && continue_prompt ;;
