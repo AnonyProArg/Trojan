@@ -61,6 +61,7 @@ echo ""
 echo " LINK DEL APK COMPATIBLE: https://www.mediafire.com/folder/hmq5cstvcg9gk/TROJAN-GO "
 echo ""
 echo " FIN DEL CURSO. PRESIONA CUALQUIERA LETRA VOLVER AL MENU" && read key
+clear
 }   
 
 VPS-ARG (){
@@ -729,7 +730,10 @@ show_menu() {
   else
   echo "0) INSTALAR TROJAN + VLSS + SHADOWSOCK (WEBSOCK)"
   fi
+  echo""
+  echo ""
   echo "100)ANTES DE INSTALAR, IMPORTANTE LEER"
+  echo ""
   echo "7) VOLVER AL MENU"
   echo ""
 }
