@@ -2,6 +2,7 @@
 export LC_ALL=C
 export LANG=en_US
 export LANGUAGE=en_US.UTF-8
+clear
 
 branch="main"
 VERSION="2.2.1"
@@ -39,6 +40,28 @@ colorEcho(){
 
 colorEchoFlush(){
   echo -ne "${colorStart}${1}${@:2}${colorEnd}\r" 1>& 2
+}
+
+leerv (){
+clear
+echo " AL INSTALAR ESTE METODO, SE OCUPARAN LOS SIGUIENTES PUERTOS: 80,443."
+echo ""
+echo " DEBES TENER YA CONFIGURADO EL CLOUDFLARE"
+echo ""
+echo " SE OCUPA OTRA APK, PORQUE NO LO SOPORTA CUALQUIERA"
+echo ""
+echo " ES 3 EN 1. INSTALA VLESS, SHADOWSOCK Y TROJAN-GO"
+echo ""
+echo " ESTOS MISMOS CON Y SIN WEBSOCK (SE RECOMIENDA LOS DE WESOCK)"
+echo ""
+echo " LINK DEL APK COMPATIBLE: "
+echo ""
+echo " FIN DEL CURSO. TECLEA 7 PARA VOLVER AL MENU"
+}   
+
+VPS-ARG (){
+clear
+sudo VPS-ARG
 }
 
 #copied & modified from v2fly fhs script
@@ -702,7 +725,8 @@ show_menu() {
   else
   echo "0) INSTALAR TROJAN + VLSS + SHADOWSOCK (WEBSOCK)"
   fi
-  echo "7) SALIR"
+  echo "100)ANTES DE INSTALAR, IMPORTANTE LEER"
+  echo "7) VOLVER AL MENU"
   echo ""
 }
 
@@ -725,6 +749,8 @@ menu() {
       "4") get_xray && continue_prompt ;;
       "5") get_trojan && continue_prompt ;;
       "6") rm_xwall ;;
+      "7") VPS-ARG ;;
+       "100") leerv ;;
       *) break ;;
     esac
   done
