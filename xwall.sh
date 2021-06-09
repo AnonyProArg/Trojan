@@ -301,7 +301,7 @@ EOF
 
 get_xray() {
   if [ ! -f "/usr/local/bin/xray" ]; then
-    echo "XRay-Core is not installed. start installation"
+    echo "XRay-Core no está instalado. iniciar la instalación"
 
     echo "Obtener la última versión de xray-core"
     latest_version=`curl -sL "https://${api_proxy}/repos/XTLS/Xray-core/releases/latest" | jq '.tag_name' --raw-output`
@@ -624,11 +624,11 @@ install_xray() {
 
   colorEchoFlush $BLUE "Configurar XRay"
   set_xray "${uuid}" "${path}" "${V2_DOMAIN}" "${cf_node_default}"
-  colorEcho $LGREEN "完成: Configurar XRay"
+  colorEcho $LGREEN "realizar: Configuracion XRay"
 
   colorEchoFlush $BLUE "Configurar Trojan"
   set_trojan "${uuid}" "${path}tj" "${V2_DOMAIN}"
-  colorEcho $LGREEN "realizar: Configurar Trojan"
+  colorEcho $LGREEN "realizar: Configuracion Trojan"
 
   colorEchoFlush $BLUE "Configurar Nginx"
   set_nginx_default | writeLog >> $log_path
@@ -686,7 +686,7 @@ rm_xwall() {
 show_menu() {
   echo ""
   if [ -f "/usr/local/bin/xray" ]; then
-  echo "             AnonyProArg VPS-ARG   "
+  echo "             TROJAN-GO+   "
   echo ""
   echo "----------Gestión de nombres de dominio----------"
   echo "1) Reparar certificado / cambiar nombre de dominio"
@@ -707,7 +707,7 @@ show_menu() {
 
 menu() {
   colorEcho ${YELLOW} "Script automatizado de herramientas proxy v${VERSION}"
-  colorEcho ${YELLOW} "author: phlinhng"
+  colorEcho ${YELLOW} "AnonyProArg"
 
   #check_status
 
