@@ -66,6 +66,7 @@ clear
 
 VPS-ARG (){
 clear
+exit
 sudo VPS-ARG
 }
 
