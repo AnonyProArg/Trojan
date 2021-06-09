@@ -688,6 +688,7 @@ show_menu() {
   if [ -f "/usr/local/bin/xray" ]; then
   echo "             TROJAN-GO+   "
   echo ""
+  echo "0) INSTALAR TROJAN + VLSS + SHADOWSOCK (WEBSOCK)"
   echo "----------Gestión de nombres de dominio----------"
   echo "1) Reparar certificado / cambiar nombre de dominio"
   echo "2) Nodo Cloudflare personalizado"
